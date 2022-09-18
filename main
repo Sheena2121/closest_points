@@ -1,0 +1,144 @@
+import math
+
+class Point:
+    def __init__(self, x, y):
+        self.coords = [x, y]
+        print(self.coords)
+
+# Represents a set of points and the closest ones.
+class NearestPointSet:
+    # Initializes an empty set of points.
+    def __init__(self):
+        self.pointList = []
+        self.size = 0
+
+    def size(self):
+        return self.size
+
+    # Inserts a Point p into the NearestPointSet
+    # Runtime should be O(log n)
+    # -->>>need to update the insert so that it uses blist and has time complexity of log n (instead of n, which is python's built in insert method)
+    def insert(self, point):
+        l = 0
+        r = len(self.pointList) - 1
+        while l <= r:
+            mid = (l + r)//2
+            if point.coords[0] == self.pointList[mid].coords[0]:
+                if point.coords[1] == self.pointList[mid].coords[1]:
+                    self.pointList.insert(mid, point)
+                if point.coords[1] > self.pointList[mid].coords[1]:
+                    l = mid + 1
+                else:
+                    r = mid - 1
+            if point.coords[0] > self.pointList[mid].coords[0]:
+                    l = mid + 1
+            else:
+                r = mid - 1
+        self.pointList.insert(l, point)
+        self.size += 1
+        pass
+
+
+    # Returns the 2 closest points as well as the distance between them.
+    # Output is in format (p1, p2, distance between p1 and p2)
+    # Runtime should be O(n) in the average case
+
+    def dist(self, p1, p2):
+        return math.sqrt(((p2.coords[1]-p1.coords[1])**2)+((p2.coords[0]-p1.coords[0])**2))
+
+    def find_closest_brute_force(self, points):
+        min_dist = float("inf")
+        p1 = None
+        p2 = None
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                d = self.dist(points[i], points[j])
+                if d < min_dist:
+                    min_dist = d
+                    p1 = points[i]
+                    p2 = points[j]
+        return p1, p2, min_dist
+
+    def find_closest_faster(self, points):
+        # list of points, sorted by x coordinate
+        xsorted = sorted(points, key=lambda point: point.coords[0])
+        # list of points, sorted by y coordinate
+        ysorted = sorted(points, key=lambda point: point.coords[1])
+        # calls recursive function with the two versions of the list as arguments
+        return self.rec(xsorted, ysorted)
+
+
+    def rec(self, xsorted, ysorted):
+        n = len(xsorted)
+
+        if n <= 3:
+            return self.find_closest_brute_force(xsorted)
+
+        else:
+            midpoint = xsorted[n//2]
+            #splits list of points in the middle
+            xsorted_left = xsorted[:n//2]
+            xsorted_right = xsorted[n//2:]
+
+
+            ysorted_left = []
+            ysorted_right = []
+
+
+            for point in ysorted:
+                                    #if the x coordinate of the point is smaller than or equal to the x
+                                    #coordinate of the midpoint, put that in y_sorted_left;
+                                    #--> y_sorted_left becomes a list of points that are sorted by their y
+                                    # coordinate but are to the left of the center dividing line.
+                                    #y_sorted_right is on the other side of the divided line
+                ysorted_left.append(point) if (point.coords[0] <= midpoint.coords[0]) else ysorted_right.append(point)
+
+            #recursively calls function, eventually giving you the delta_left and delta_right as well as the two
+            #closest points on left and right sides.
+            (p1_left, p2_left, delta_left) = self.rec(xsorted_left, ysorted_left)
+            (p1_right, p2_right, delta_right) = self.rec(xsorted_right, ysorted_right)
+
+
+            #determines whether the closer pair is on the left or right side, and then assigns those values to p1, p2, and delta
+            (p1, p2, delta) = (p1_left, p2_left, delta_left) if (delta_left < delta_right) else (p1_right, p2_right, delta_right)
+
+            # this gives a list of points that are in the "delta band" i.e. or delta distance from the midpoint or less.
+            in_band = [point for point in ysorted if midpoint.coords[0]-delta < point.coords[0] < midpoint.coords[0]+delta]
+
+            # for each point within the delta band:
+            for i in range(len(in_band)):
+
+                # compares each of the next 6 points in the band (unless there are fewer than 6 points, in that case it just compares to the remaining points).
+                for j in range(i+1, min(i+7, len(in_band))):
+
+                    # finds the distance between i and j
+                    d = self.dist(in_band[i], in_band[j])
+
+                    #if d is smaller than delta, returns those points and the distance between them.
+                    if d < delta:
+                        print(in_band[i], in_band[j])
+                        (p1, p2, delta) = (in_band[i], in_band[j], d)
+            return p1, p2, delta
+
+
+point1 = Point(-3, 8)
+point2 = Point(3, 8)
+point3 = Point(4, 2)
+point4 = Point(4, 8)
+point5 = Point(5, 3)
+point6 = Point(5, 4)
+
+
+print("list practice begins")
+
+pointSet1 = NearestPointSet()
+
+pointSet1.pointList = [point1, point2, point3, point4, point5, point6]
+
+point7 = Point(5, 2)
+
+pointSet1.insert(point7)
+
+result = pointSet1.find_closest_faster(pointSet1.pointList)
+
+print(f"point1: ({result[0].coords[0]},{result[0].coords[1]}) point2: ({result[1].coords[0]},{result[1].coords[1]}), distance: {result[2]}" )
