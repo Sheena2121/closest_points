@@ -15,9 +15,6 @@ class NearestPointSet:
     def size(self):
         return self.size
 
-    # Inserts a Point p into the NearestPointSet
-    # Runtime should be O(log n)
-    # -->>>need to update the insert so that it uses blist and has time complexity of log n (instead of n, which is python's built in insert method)
     def insert(self, point):
         l = 0
         r = len(self.pointList) - 1
@@ -38,11 +35,6 @@ class NearestPointSet:
         self.size += 1
         pass
 
-
-    # Returns the 2 closest points as well as the distance between them.
-    # Output is in format (p1, p2, distance between p1 and p2)
-    # Runtime should be O(n) in the average case
-
     def dist(self, p1, p2):
         return math.sqrt(((p2.coords[1]-p1.coords[1])**2)+((p2.coords[0]-p1.coords[0])**2))
 
@@ -56,8 +48,11 @@ class NearestPointSet:
                 d = self.dist(points[i], points[j])
                 if d < min_dist:
                     min_dist = d
+                    
                     p1 = points[i]
                     p2 = points[j]
+
+            
         return p1, p2, min_dist
 
     def find_closest_faster(self, points):
@@ -71,8 +66,9 @@ class NearestPointSet:
 
     def rec(self, xsorted, ysorted):
         n = len(xsorted)
-
-        if n <= 3:
+        if n <= 1:
+            print("you need at least two points for this!")
+        if 1 < n <= 3:
             return self.find_closest_brute_force(xsorted)
 
         else:
