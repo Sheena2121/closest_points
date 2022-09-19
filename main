@@ -39,21 +39,28 @@ class NearestPointSet:
         return math.sqrt(((p2.coords[1]-p1.coords[1])**2)+((p2.coords[0]-p1.coords[0])**2))
 
     def find_closest_brute_force(self, points):
-
         min_dist = float("inf")
         p1 = None
         p2 = None
+        points_with_same_min_dist = 0
         for i in range(len(points)):
             for j in range(i + 1, len(points)):
                 d = self.dist(points[i], points[j])
                 if d < min_dist:
                     min_dist = d
-                    
                     p1 = points[i]
                     p2 = points[j]
 
-            
-        return p1, p2, min_dist
+        ## added to see if there are multiple points that have the same smallest distance
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                d = self.dist(points[i], points[j])
+                if d == min_dist:
+                    points_with_same_min_dist += 1
+        if points_with_same_min_dist > 1:
+            return "multiple correct answers"
+        else:
+            return p1, p2, min_dist
 
     def find_closest_faster(self, points):
         # list of points, sorted by x coordinate
@@ -114,4 +121,3 @@ class NearestPointSet:
                         #print(in_band[i], in_band[j])
                         (p1, p2, delta) = (in_band[i], in_band[j], d)
             return p1, p2, delta
-
