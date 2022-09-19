@@ -3,7 +3,7 @@ import math
 class Point:
     def __init__(self, x, y):
         self.coords = [x, y]
-        print(self.coords)
+        #print(self.coords)
 
 # Represents a set of points and the closest ones.
 class NearestPointSet:
@@ -47,6 +47,7 @@ class NearestPointSet:
         return math.sqrt(((p2.coords[1]-p1.coords[1])**2)+((p2.coords[0]-p1.coords[0])**2))
 
     def find_closest_brute_force(self, points):
+
         min_dist = float("inf")
         p1 = None
         p2 = None
@@ -83,8 +84,6 @@ class NearestPointSet:
 
             ysorted_left = []
             ysorted_right = []
-
-
             for point in ysorted:
                                     #if the x coordinate of the point is smaller than or equal to the x
                                     #coordinate of the midpoint, put that in y_sorted_left;
@@ -116,29 +115,7 @@ class NearestPointSet:
 
                     #if d is smaller than delta, returns those points and the distance between them.
                     if d < delta:
-                        print(in_band[i], in_band[j])
+                        #print(in_band[i], in_band[j])
                         (p1, p2, delta) = (in_band[i], in_band[j], d)
             return p1, p2, delta
 
-
-point1 = Point(-3, 8)
-point2 = Point(3, 8)
-point3 = Point(4, 2)
-point4 = Point(4, 8)
-point5 = Point(5, 3)
-point6 = Point(5, 4)
-
-
-print("list practice begins")
-
-pointSet1 = NearestPointSet()
-
-pointSet1.pointList = [point1, point2, point3, point4, point5, point6]
-
-point7 = Point(5, 2)
-
-pointSet1.insert(point7)
-
-result = pointSet1.find_closest_faster(pointSet1.pointList)
-
-print(f"point1: ({result[0].coords[0]},{result[0].coords[1]}) point2: ({result[1].coords[0]},{result[1].coords[1]}), distance: {result[2]}" )
